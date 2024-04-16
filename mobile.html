@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>霍尔效应实验数据处理</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center; /* 让容器内的文本居中 */
+    }
+    h1 {
+        text-align: center;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        text-align: center; /* 让表格内的文本居中 */
+    }
+    th, td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    input[type="text"] {
+        width: 60px; /* 调整输入框的宽度 */
+        text-align: center; /* 让输入框内的文本居中 */
+    }
+    #calculateBtn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #result {
+        margin-top: 20px;
+    }
+
+    #result-left,
+    #result-right {
+        display: inline-block;
+        width: 49%;
+        text-align: center;
+    }
+    #status {
+        margin-top: 20px;
+        text-align: center; /* 让结果文本居中 */
+    }
+
+    /* 响应式设计 */
+    @media screen and (max-width: 767px) {
+        .container {
+            margin: 20px;
+            padding: 15px;
+        }
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        input[type="text"], #calculateBtn {
+            width: 90%;
+            margin: 5px auto; /* 调整输入框和按钮的外边距 */
+            padding: 15px;
+            font-size: 16px; /* 调整字体大小 */
+        }
+        #result-left, #result-right {
+            width: 100%;
+            margin-top: 10px;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>霍尔效应实验数据处理</h1>
+    <label>U<sub>H</sub>-I<sub>S</sub>(I<sub>M</sub>=300mA)</label>
+    <br><br>
+    <form id="data-form">
+        <table>
+            <thead>
+              <tr>
+                <th>I<sub>S</sub>/mA</th>
+                <th>U<sub>1</sub>/mV<br>(+I<sub>M</sub>,+I<sub>S</sub>)</th>
+                <th>U<sub>2</sub>/mV<br>(+I<sub>M</sub>,-I<sub>S</sub>)</th>
+                <th>U<sub>3</sub>/mV<br>(-I<sub>M</sub>,-I<sub>S</sub>)</th>
+                <th>U<sub>4</sub>/mV<br>(-I<sub>M</sub>,+I<sub>S</sub>)</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>0.50</td>
+                  <td><input type="text" name="cell0111"></td>
+                  <td><input type="text" name="cell0112"></td>
+                  <td><input type="text" name="cell0113"></td>
+                  <td><input type="text" name="cell0114"></td>
+                </tr>
+                <tr>
+                  <td>1.00</td>
+                  <td><input type="text" name="cell0121"></td>
+                  <td><input type="text" name="cell0122"></td>
+                  <td><input type="text" name="cell0123"></td>
+                  <td><input type="text" name="cell0124"></td>
+                </tr>
+                <tr>
+                  <td>1.50</td>
+                  <td><input type="text" name="cell0131"></td>
+                  <td><input type="text" name="cell0132"></td>
+                  <td><input type="text" name="cell0133"></td>
+                  <td><input type="text" name="cell0134"></td>
+                </tr>
+                <tr>
+                  <td>2.00</td>
+                  <td><input type="text" name="cell0141"></td>
+                  <td><input type="text" name="cell0142"></td>
+                  <td><input type="text" name="cell0143"></td>
+                  <td><input type="text" name="cell0144"></td>
+                </tr>
+                <tr>
+                  <td>2.50</td>
+                  <td><input type="text" name="cell0151"></td>
+                  <td><input type="text" name="cell0152"></td>
+                  <td><input type="text" name="cell0153"></td>
+                  <td><input type="text" name="cell0154"></td>
+                </tr>
+                <tr>
+                  <td>3.00</td>
+                  <td><input type="text" name="cell0161"></td>
+                  <td><input type="text" name="cell0162"></td>
+                  <td><input type="text" name="cell0163"></td>
+                  <td><input type="text" name="cell0164"></td>
+                </tr>
+              </tbody>
+            </table>
+            <label>U<sub>H</sub>-I<sub>M</sub>和B-I<sub>M</sub>(I<sub>S</sub>=1.00mA)</label>
+            <br><br>
+            <table>
+              <thead>
+                <tr>
+                  <th>I<sub>M</sub>/mA</th>
+                  <th>U<sub>1</sub>/mV<br>(+I<sub>M</sub>,+I<sub>S</sub>)</th>
+                  <th>U<sub>2</sub>/mV<br>(+I<sub>M</sub>,-I<sub>S</sub>)</th>
+                  <th>U<sub>3</sub>/mV<br>(-I<sub>M</sub>,-I<sub>S</sub>)</th>
+                  <th>U<sub>4</sub>/mV<br>(-I<sub>M</sub>,+I<sub>S</sub>)</th>
+                  <th>B<sub>1</sub>/mT<br>(+I<sub>M</sub>,+I<sub>S</sub>)</th>
+                  <th>B<sub>2</sub>/mT<br>(+I<sub>M</sub>,-I<sub>S</sub>)</th>
+                  <th>B<sub>3</sub>/mT<br>(-I<sub>M</sub>,-I<sub>S</sub>)</th>
+                  <th>B<sub>4</sub>/mT<br>(-I<sub>M</sub>,+I<sub>S</sub>)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>50</td>
+                  <td><input type="text" name="cell02011"></td>
+                  <td><input type="text" name="cell02012"></td>
+                  <td><input type="text" name="cell02013"></td>
+                  <td><input type="text" name="cell02014"></td>
+                  <td><input type="text" name="cell02015"></td>
+                  <td><input type="text" name="cell02016"></td>
+                  <td><input type="text" name="cell02017"></td>
+                  <td><input type="text" name="cell02018"></td>
+                </tr>
+                <tr>
+                  <td>100</td>
+                  <td><input type="text" name="cell02021"></td>
+                  <td><input type="text" name="cell02022"></td>
+                  <td><input type="text" name="cell02023"></td>
+                  <td><input type="text" name="cell02024"></td>
+                  <td><input type="text" name="cell02025"></td>
+                  <td><input type="text" name="cell02026"></td>
+                  <td><input type="text" name="cell02027"></td>
+                  <td><input type="text" name="cell02028"></td>
+                </tr>
+                <tr>
+                  <td>150</td>
+                  <td><input type="text" name="cell02031"></td>
+                  <td><input type="text" name="cell02032"></td>
+                  <td><input type="text" name="cell02033"></td>
+                  <td><input type="text" name="cell02034"></td>
+                  <td><input type="text" name="cell02035"></td>
+                  <td><input type="text" name="cell02036"></td>
+                  <td><input type="text" name="cell02037"></td>
+                  <td><input type="text" name="cell02038"></td>
+                </tr>
+                <tr>
+                  <td>200</td>
+                  <td><input type="text" name="cell02041"></td>
+                  <td><input type="text" name="cell02042"></td>
+                  <td><input type="text" name="cell02043"></td>
+                  <td><input type="text" name="cell02044"></td>
+                  <td><input type="text" name="cell02045"></td>
+                  <td><input type="text" name="cell02046"></td>
+                  <td><input type="text" name="cell02047"></td>
+                  <td><input type="text" name="cell02048"></td>
+                </tr>
+                <tr>
+                  <td>250</td>
+                  <td><input type="text" name="cell02051"></td>
+                  <td><input type="text" name="cell02052"></td>
+                  <td><input type="text" name="cell02053"></td>
+                  <td><input type="text" name="cell02054"></td>
+                  <td><input type="text" name="cell02055"></td>
+                  <td><input type="text" name="cell02056"></td>
+                  <td><input type="text" name="cell02057"></td>
+                  <td><input type="text" name="cell02058"></td>
+                </tr>
+                <tr>
+                  <td>300</td>
+                  <td><input type="text" name="cell02061"></td>
+                  <td><input type="text" name="cell02062"></td>
+                  <td><input type="text" name="cell02063"></td>
+                  <td><input type="text" name="cell02064"></td>
+                  <td><input type="text" name="cell02065"></td>
+                  <td><input type="text" name="cell02066"></td>
+                  <td><input type="text" name="cell02067"></td>
+                  <td><input type="text" name="cell02068"></td>
+                </tr>
+                <tr>
+                  <td>350</td>
+                  <td><input type="text" name="cell02071"></td>
+                  <td><input type="text" name="cell02072"></td>
+                  <td><input type="text" name="cell02073"></td>
+                  <td><input type="text" name="cell02074"></td>
+                  <td><input type="text" name="cell02075"></td>
+                  <td><input type="text" name="cell02076"></td>
+                  <td><input type="text" name="cell02077"></td>
+                  <td><input type="text" name="cell02078"></td>
+                </tr>
+                <tr>
+                  <td>400</td>
+                  <td><input type="text" name="cell02081"></td>
+                  <td><input type="text" name="cell02082"></td>
+                  <td><input type="text" name="cell02083"></td>
+                  <td><input type="text" name="cell02084"></td>
+                  <td><input type="text" name="cell02085"></td>
+                  <td><input type="text" name="cell02086"></td>
+                  <td><input type="text" name="cell02087"></td>
+                  <td><input type="text" name="cell02088"></td>
+                </tr>
+                <tr>
+                  <td>450</td>
+                  <td><input type="text" name="cell02091"></td>
+                  <td><input type="text" name="cell02092"></td>
+                  <td><input type="text" name="cell02093"></td>
+                  <td><input type="text" name="cell02094"></td>
+                  <td><input type="text" name="cell02095"></td>
+                  <td><input type="text" name="cell02096"></td>
+                  <td><input type="text" name="cell02097"></td>
+                  <td><input type="text" name="cell02098"></td>
+                </tr>
+                <tr>
+                  <td>500</td>
+                  <td><input type="text" name="cell02101"></td>
+                  <td><input type="text" name="cell02102"></td>
+                  <td><input type="text" name="cell02103"></td>
+                  <td><input type="text" name="cell02104"></td>
+                  <td><input type="text" name="cell02105"></td>
+                  <td><input type="text" name="cell02106"></td>
+                  <td><input type="text" name="cell02107"></td>
+                  <td><input type="text" name="cell02108"></td>
+                </tr>
+              </tbody>
+            </table>
+    </form>
+    <button id="calculateBtn">执行程序</button>
+    <div id="result">
+        <div id="result-left"></div>
+        <div id="result-right"></div>
+    </div>
+    <div id="status"></div>
+    <div id="chart-container">
+        <svg id="chart" width="300" height="400"></svg>
+    </div>
+    <div id="tu2"></div>
+    <div id="chart-container2">
+        <svg id="chart2" width="300" height="400"></svg>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        try{
+          function calculateUhIM() {
+            // 获取所有输入框的值
+            const cells = document.querySelectorAll('input[name^="cell01"]');
+            // 初始化结果数组
+            const UH = [];
+
+            // 遍历每一行
+            for (let i = 0; i < cells.length; i += 4) {
+                // 获取当前行的四个输入框的值
+                const U1 = parseFloat(cells[i].value);
+                const U2 = parseFloat(cells[i + 1].value);
+                const U3 = parseFloat(cells[i + 2].value);
+                const U4 = parseFloat(cells[i + 3].value);
+                if (isNaN(U1)) throw "请输入有效的数字";
+                if (isNaN(U2)) throw "请输入有效的数字";
+                if (isNaN(U3)) throw "请输入有效的数字";
+                if (isNaN(U4)) throw "请输入有效的数字";
+
+                // 计算 Uh
+                const Uh = (U1 - U2 + U3 - U4) / 4;
+
+                // 将结果添加到结果数组中
+                UH.push(Uh);
+            }
+
+            // 计算最小二乘法
+            var data_x = [0.50, 1.00, 1.50, 2.00, 2.50, 3.00];
+            var data_y = UH;
+            var n = data_y.length;
+            var sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (var i = 0; i < n; i++) {
+                sumX += data_x[i];
+                sumY += data_y[i];
+                sumXY += data_x[i] * data_y[i];
+                sumXX += data_x[i] * data_x[i];
+            }
+            z = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+
+            // 图像计算
+            var average_X = sumX / n
+            var average_Y = sumY / n
+            var A = average_Y - z * average_X
+            var y_start = A+ z * data_x[0]
+            var y_end = A + z * data_x[data_x.length - 1]
+            var max = Math.max(...data_y);
+            var min = Math.min(...data_y);
+            var mm = max - min;
+
+
+            // 删除已有图表
+            const existingSvg = d3.select("#chart");
+            existingSvg.selectAll("*").remove();
+            // 创建 SVG 图表
+            const svg = d3.select("#chart");
+
+            // 定义比例尺
+            const xScale = d3.scaleLinear()
+              .domain([0, data_x[data_x.length - 1]]) // 调整域
+              .range([50, 300]);
+
+            const yScale = d3.scaleLinear()
+              .domain([min -0.1 * mm, max + 0.1 * mm]) // 调整域
+              .range([350, 0]);
+
+            // 创建 x 轴和 y 轴
+            const xAxis = d3.axisBottom(xScale);
+            const yAxis = d3.axisLeft(yScale);
+
+            // 添加 x 轴到 SVG
+            svg.append("g")
+              .attr("class", "x-axis")
+              .attr("transform", "translate(0, 350)")
+              .call(xAxis);
+
+            // 添加 y 轴到 SVG
+            svg.append("g")
+              .attr("class", "y-axis")
+              .attr("transform", "translate(50, 0)")
+              .call(yAxis);
+
+            // 画线
+            const line = svg.append("line")
+              .attr("x1", xScale(data_x[0]))
+              .attr("y1", yScale(y_start))
+              .attr("x2", xScale(data_x[data_x.length - 1]))
+              .attr("y2", yScale(y_end))
+              .attr("stroke", "red")
+              .attr("stroke-width", 2);
+
+            // 画点
+            for (let i = 1; i <= n; i ++) {
+              const point = svg.append("circle")
+                .attr("id", `point${i}`) // 为每个点添加唯一 ID
+                .attr("cx", xScale(data_x[i-1]))
+                .attr("cy", yScale(data_y[i-1]))
+                .attr("r", 5)
+                .attr("fill", "blue");
+            }
+
+            // 缩放行为
+            const zoom = d3.zoom()
+              .scaleExtent([0.5, 5])
+              .on("zoom", zoomed);
+
+            svg.call(zoom);
+
+            function zoomed(event) {
+              const { transform } = event;
+
+              // 更新 x 轴和 y 轴比例尺
+              const newXScale = transform.rescaleX(xScale);
+              const newYScale = transform.rescaleY(yScale);
+
+              // 更新 x 轴和 y 轴
+              svg.select(".x-axis").call(xAxis.scale(newXScale));
+              svg.select(".y-axis").call(yAxis.scale(newYScale));
+
+              // 更新线的位置
+              line.attr("x1", newXScale(data_x[0]))
+                  .attr("y1", newYScale(y_start))
+                  .attr("x2", newXScale(data_x[data_x.length - 1]))
+                  .attr("y2", newYScale(y_end));
+
+              // 更新点的位置
+              for (let i = 1; i <= n; i++) {
+                const point = svg.select(`#point${i}`);
+                point.attr("cx", newXScale(data_x[i-1]))
+                     .attr("cy", newYScale(data_y[i-1]));
+              }
+            }
+          }
+          function calculateBI() {
+            // 获取所有输入框的值
+            const cells2 = document.querySelectorAll('input[name^="cell02"]');
+            // 初始化结果数组
+            const UH = [];
+            B = [];
+
+            // 遍历每一行
+            for (let i = 0; i < cells2.length; i += 8) {
+                // 获取当前行的四个输入框的值
+                const U1 = parseFloat(cells2[i].value);
+                const U2 = parseFloat(cells2[i + 1].value);
+                const U3 = parseFloat(cells2[i + 2].value);
+                const U4 = parseFloat(cells2[i + 3].value);
+                if (isNaN(U1)) throw "请输入有效的数字";
+                if (isNaN(U2)) throw "请输入有效的数字";
+                if (isNaN(U3)) throw "请输入有效的数字";
+                if (isNaN(U4)) throw "请输入有效的数字";
+
+                // 计算 Uh
+                const Uh = (U1 - U2 + U3 - U4) / 4;
+
+                // 将结果添加到结果数组中
+                UH.push(Uh);
+            }
+
+            for (let i = 4; i < cells2.length; i += 8) {
+                // 获取当前行的四个输入框的值
+                const B1 = parseFloat(cells2[i].value);
+                const B2 = parseFloat(cells2[i + 1].value);
+                const B3 = parseFloat(cells2[i + 2].value);
+                const B4 = parseFloat(cells2[i + 3].value);
+                if (isNaN(B1)) throw "请输入有效的数字";
+                if (isNaN(B2)) throw "请输入有效的数字";
+                if (isNaN(B3)) throw "请输入有效的数字";
+                if (isNaN(B4)) throw "请输入有效的数字";
+
+                // 计算 Uh
+                const Bb = (B1 + B2 - B3 - B4) / 4;
+
+                // 将结果添加到结果数组中
+                B.push(Bb);
+            }
+
+            // 计算最小二乘法
+            var data_x = B;
+            var data_y = UH;
+            var n = data_y.length;
+            var sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (var i = 0; i < n; i++) {
+                sumX += data_x[i];
+                sumY += data_y[i];
+                sumXY += data_x[i] * data_y[i];
+                sumXX += data_x[i] * data_x[i];
+            }
+            z2 = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+
+            // 图像计算
+            var average_X = sumX / n
+            var average_Y = sumY / n
+            var A = average_Y - z2 * average_X
+            var y_start = A+ z2 * data_x[0]
+            var y_end = A + z2 * data_x[data_x.length - 1]
+            var max = Math.max(...data_y);
+            var min = Math.min(...data_y);
+            var mm = max - min;
+
+            const existingSvg = d3.select("#chart2");
+            existingSvg.selectAll("*").remove();
+            // 创建 SVG 图表
+            const svg = d3.select("#chart2");
+
+            // 定义比例尺
+            const xScale = d3.scaleLinear()
+                .domain([0, data_x[data_x.length - 1]]) // 调整域
+                .range([50, 300]);
+
+            const yScale = d3.scaleLinear()
+                .domain([min -0.1 * mm, max + 0.1 * mm]) // 调整域
+                .range([350, 0]);
+
+            // 创建 x 轴和 y 轴
+            const xAxis = d3.axisBottom(xScale);
+            const yAxis = d3.axisLeft(yScale);
+
+            // 添加 x 轴到 SVG
+            svg.append("g")
+                .attr("class", "x-axis")
+                .attr("transform", "translate(0, 350)")
+                .call(xAxis);
+
+            // 添加 y 轴到 SVG
+            svg.append("g")
+                .attr("class", "y-axis")
+                .attr("transform", "translate(50, 0)")
+                .call(yAxis);
+
+            // 画线
+            const line = svg.append("line")
+                .attr("x1", xScale(data_x[0]))
+                .attr("y1", yScale(y_start))
+                .attr("x2", xScale(data_x[data_x.length - 1]))
+                .attr("y2", yScale(y_end))
+                .attr("stroke", "red")
+                .attr("stroke-width", 2);
+
+            // 画点
+            for (let i = 1; i <= 10; i ++) {
+                const point = svg.append("circle")
+                .attr("id", `point${i}`) // 为每个点添加唯一 ID
+                .attr("cx", xScale(data_x[i-1]))
+                .attr("cy", yScale(data_y[i-1]))
+                .attr("r", 5)
+                .attr("fill", "blue");
+            }
+
+            // 缩放行为
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 5])
+                .on("zoom", zoomed);
+
+            svg.call(zoom);
+
+            function zoomed(event) {
+                const { transform } = event;
+
+                // 更新 x 轴和 y 轴比例尺
+                const newXScale = transform.rescaleX(xScale);
+                const newYScale = transform.rescaleY(yScale);
+
+                // 更新 x 轴和 y 轴
+                svg.select(".x-axis").call(xAxis.scale(newXScale));
+                svg.select(".y-axis").call(yAxis.scale(newYScale));
+
+                // 更新线的位置
+                line.attr("x1", newXScale(data_x[0]))
+                    .attr("y1", newYScale(y_start))
+                    .attr("x2", newXScale(data_x[data_x.length - 1]))
+                    .attr("y2", newYScale(y_end));
+
+                // 更新点的位置
+                for (let i = 1; i <= 10; i++) {
+                const point = svg.select(`#point${i}`);
+                point.attr("cx", newXScale(data_x[i-1]))
+                        .attr("cy", newYScale(data_y[i-1]));
+                }
+            }
+          }
+          // 执行计算函数
+          calculateUhIM();
+          calculateBI();
+
+          // 计算结果
+          var kh1 = z / B[5] * 1000
+          var kh2 = z2 / 1 * 1000
+          var n1 = 1 /(kh1 * 1.6 * Math.pow(10, -19) * 0.6 * Math.pow(10, -6))
+          var n2 = 1 /(kh2 * 1.6 * Math.pow(10, -19) * 0.6 * Math.pow(10, -6))
+          var n11 = n1.toExponential()
+          var n22 = n2.toExponential()
+          var parts1 = n11.split("e");
+          var base1 = parseFloat(parts1[0]);
+          var exponent1 = parseInt(parts1[1]);
+          var parts2 = n22.split("e");
+          var base2 = parseFloat(parts2[0]);
+          var exponent2 = parseInt(parts2[1]);
+
+          // 显示结果
+          document.getElementById("result-left").innerHTML = "计算UH-I(M)方法：<br>灵敏度为：" + kh1.toFixed(4) + "mV ⋅ mA<sup>-1</sup> ⋅ T<sup>-1</sup><br>载流子浓度为：" + base1.toFixed(2) + " × 10<sup>" + exponent1 + "</sup>  m<sup>-3</sup>";
+          document.getElementById("result-right").innerHTML = "计算UH-B方法：<br>灵敏度为：" + kh2.toFixed(4) + "mV ⋅ mA<sup>-1</sup> ⋅ T<sup>-1</sup><br>载流子浓度为：" + base2.toFixed(2) + " × 10<sup>" + exponent2 + "</sup>  m<sup>-3</sup>";
+          document.getElementById("status").innerHTML = "运行完毕<br><br>下图为UH-I(M)方法的最小二乘法拟合图：<br><br>";
+          document.getElementById("tu2").innerHTML = "下图为UH-B方法的最小二乘法拟合图：<br><br>";
+
+            
+        } catch (error) {
+            document.getElementById("status").innerHTML = "错误：" + error;
+            document.getElementById("result").innerHTML = ""
+            d3.select("#chart").selectAll("*").remove();
+            d3.select("#chart2").selectAll("*").remove();
+        }
+    });
+</script>
+</body>
+</html>

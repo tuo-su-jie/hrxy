@@ -322,9 +322,12 @@
             var A = average_Y - z * average_X
             var y_start = A+ z * data_x[0]
             var y_end = A + z * data_x[data_x.length - 1]
-            var max = Math.max(...data_y);
-            var min = Math.min(...data_y);
-            var mm = max - min;
+            var max_x = Math.max(...data_x);
+            var min_x = Math.min(...data_x);
+            var nn = max_x - min_x;
+            var max_y = Math.max(...data_y);
+            var min_y = Math.min(...data_y);
+            var mm = max_y - min_y;
 
 
             // 删除已有图表
@@ -335,11 +338,11 @@
 
             // 定义比例尺
             const xScale = d3.scaleLinear()
-              .domain([0, data_x[data_x.length - 1]]) // 调整域
+              .domain([min_x -0.1 * nn, max_x + 0.1 * nn]) // 调整域
               .range([50, 550]);
 
             const yScale = d3.scaleLinear()
-              .domain([min -0.1 * mm, max + 0.1 * mm]) // 调整域
+              .domain([min_y -0.1 * mm, max_y + 0.1 * mm]) // 调整域
               .range([350, 0]);
 
             // 创建 x 轴和 y 轴
@@ -472,9 +475,12 @@
             var A = average_Y - z2 * average_X
             var y_start = A+ z2 * data_x[0]
             var y_end = A + z2 * data_x[data_x.length - 1]
-            var max = Math.max(...data_y);
-            var min = Math.min(...data_y);
-            var mm = max - min;
+            var max_x = Math.max(...data_x);
+            var min_x = Math.min(...data_x);
+            var nn = max_x - min_x;
+            var max_y = Math.max(...data_y);
+            var min_y = Math.min(...data_y);
+            var mm = max_y - min_y;
 
             const existingSvg = d3.select("#chart2");
             existingSvg.selectAll("*").remove();
@@ -483,11 +489,11 @@
 
             // 定义比例尺
             const xScale = d3.scaleLinear()
-                .domain([0, data_x[data_x.length - 1]]) // 调整域
+                .domain([min_x -0.1 * nn, max_x + 0.1 * nn]) // 调整域
                 .range([50, 550]);
 
             const yScale = d3.scaleLinear()
-                .domain([min -0.1 * mm, max + 0.1 * mm]) // 调整域
+                .domain([min_y -0.1 * mm, max_y + 0.1 * mm]) // 调整域
                 .range([350, 0]);
 
             // 创建 x 轴和 y 轴
